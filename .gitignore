@@ -1,0 +1,6 @@
+/my_base.db
+Scripts/
+.vscode/
+config/.env
+__pycache__
+venv/
