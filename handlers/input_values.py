@@ -6,12 +6,14 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import InitialValues
+from database.orm_query import orm_add_values
 
 
 calculator_router = Router()
 
 #Машина состояний
 class CalculationOfCar(StatesGroup):
+   user_id = State()
    the_number_of_days_of_downtime_at_the_station = State()    # количество суток простоя на станции
    idle_time_at_the_terminal_before_loading = State()   #время простоя на терминале до погрузки
    the_cost_of_downtime_on_pnop = State()   #стоимость простоя пноп
@@ -27,8 +29,10 @@ class CalculationOfCar(StatesGroup):
 #количество суток простоя на станции
 @calculator_router.message(StateFilter(None), Command('work'))
 async def first_value(message: types.Message, state: FSMContext):
+   user_id = message.from_user.id
    await message.answer("Введите количество суток простоя на станции:")
    await state.set_state(CalculationOfCar.the_number_of_days_of_downtime_at_the_station)
+   await state.update_data(user_id=user_id)
 
 
 #отмена действий
@@ -50,6 +54,7 @@ async def second_value(message: types.Message, state: FSMContext):
    await state.update_data(the_number_of_days_of_downtime_at_the_station=message.text)
    await message.answer("Введите время простоя на терминале до погрузки:")
    await state.set_state(CalculationOfCar.idle_time_at_the_terminal_before_loading)
+
 
 
 #стоимость простоя пноп
@@ -112,22 +117,15 @@ async def ninth_value(message: types.Message, state: FSMContext):
 @calculator_router.message(CalculationOfCar.travel_time_to_the_terminal, F.text)
 async def the_end_of_the_calculations(message: types.Message, state: FSMContext, session: AsyncSession):
    await state.update_data(travel_time_to_the_terminal=message.text)
-   await message.answer("Данные получены!")     
    data = await state.get_data()
-   
-   obj = InitialValues(
-      float(data['the_number_of_days_of_downtime_at_the_station']),
-      float(data['idle_time_at_the_terminal_before_loading']),
-      float(data['the_cost_of_downtime_on_pnop']),
-      float(data['the_cost_of_the_car']),
-      float(data['travel_time_to_the_station_on_the_railway_network']),
-      float(data['throwing_time_on_request']),
-      float(data['empty_mileage_distance']),
-      float(data['year_of_indexing']),
-      float(data['travel_time_to_the_terminal']),
-   )
-   session.add(obj)
-   await session.commit()
-   
-   await message.answer(str(data)) #отправим данные в чат проебразуя в текст
-   await state.clear()
+   # user_id = data.get('user_id')
+   try:
+      await orm_add_values(session, data)
+      await message.answer("Данные получены!") 
+      await state.clear()
+      
+   except Exception as e:
+      await message.answer('Что то пошло не так...')
+      await state.clear()
+
+

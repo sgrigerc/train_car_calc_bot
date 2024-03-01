@@ -10,7 +10,7 @@ from database.engine import create_db, drop_db, session_maker
 from config.bot_config import bot, dp
 # from middlewares.db import CounterMiddleware
 from handlers.base import base_router
-from handlers.car_calculator import calculator_router
+from handlers.input_values import calculator_router
 from common.bot_comman_list import private
 from middlewares.db import DataBaseSession
 
@@ -48,7 +48,6 @@ async def main():
 if __name__ == '__main__':
    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
    try:
-      print('бот запущен')
       asyncio.run(main())
    except (KeyboardInterrupt, SystemExit):
       logging.info("Bot stopped!")

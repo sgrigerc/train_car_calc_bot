@@ -1,15 +1,18 @@
-from sqlalchemy import DateTime , Float, String, Text, func
+from sqlalchemy import DateTime , Float, String, Text, func, BigInteger, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
    created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
 
+   def __init__(self, created=None):
+      self.created = created
 
 class InitialValues(Base):
    __tablename__ = 'i_values'
    
    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+   user_id: Mapped[int] = mapped_column(Integer, nullable=False)
    the_number_of_days_of_downtime_at_the_station:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    idle_time_at_the_terminal_before_loading:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    the_cost_of_downtime_on_pnop:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
@@ -22,6 +25,7 @@ class InitialValues(Base):
    
    def __init__(
       self,
+      user_id,
       the_number_of_days_of_downtime_at_the_station,
       idle_time_at_the_terminal_before_loading,
       the_cost_of_downtime_on_pnop,
@@ -32,6 +36,7 @@ class InitialValues(Base):
       year_of_indexing,
       travel_time_to_the_terminal,
    ):
+      self.user_id = user_id
       self.the_number_of_days_of_downtime_at_the_station = the_number_of_days_of_downtime_at_the_station
       self.idle_time_at_the_terminal_before_loading = idle_time_at_the_terminal_before_loading
       self.the_cost_of_downtime_on_pnop = the_cost_of_downtime_on_pnop
