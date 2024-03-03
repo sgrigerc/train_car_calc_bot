@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime , Float, String, Text, func, BigInteger, Integer
+from sqlalchemy import DateTime , Float, func, BigInteger, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -46,5 +46,43 @@ class InitialValues(Base):
       self.empty_mileage_distance = empty_mileage_distance
       self.year_of_indexing = year_of_indexing
       self.travel_time_to_the_terminal = travel_time_to_the_terminal
+
+
+class ResultValues(Base):
+   __tablename__ = 'r_values'
+   
+   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+   user_id: Mapped[int] = mapped_column(Integer, nullable=False)
+   trfdottpatusalt_19_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   trfdottpatusalt_19_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   trfdottpatusalt_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   trfdottpatusalt_19_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   trfdottpatusalt_19_25_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   trfdottpatusalt_25_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    
    
+   def __init__(
+      self,
+      user_id,
+      trfdottpatusalt_19_1,
+      trfdottpatusalt_19_25_1,
+      trfdottpatusalt_25_1,
+      trfdottpatusalt_19_2,
+      trfdottpatusalt_19_25_2,
+      trfdottpatusalt_25_2
+   ):
+      self.user_id = user_id
+      self.trfdottpatusalt_19_1 = trfdottpatusalt_19_1
+      self.trfdottpatusalt_19_25_1 = trfdottpatusalt_19_25_1
+      self.trfdottpatusalt_25_1 = trfdottpatusalt_25_1
+      self.trfdottpatusalt_19_2 = trfdottpatusalt_19_2
+      self.trfdottpatusalt_19_25_2 = trfdottpatusalt_19_25_2
+      self.trfdottpatusalt_25_2 = trfdottpatusalt_25_2
+
+
+
+
+
+
+
+

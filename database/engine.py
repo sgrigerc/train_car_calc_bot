@@ -8,7 +8,7 @@ load_dotenv(find_dotenv())
 DB_LITE = 'sqlite+aiosqlite:///my_base.db'
 
 
-engine = create_async_engine(DB_LITE, echo=True)   #эхо выводит значения в терминал
+engine = create_async_engine(DB_LITE, echo=False)   #эхо выводит значения в терминал
 
 session_maker = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
