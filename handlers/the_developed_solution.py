@@ -22,8 +22,8 @@ from database.models import InitialValues
 from database.engine import engine, session_maker
 from decimal import Decimal
 
-SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
+SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 getting_values_router = Router()
 
@@ -36,7 +36,6 @@ async def calculate_handler(message: types.Message, state: FSMContext):
       result = await session.execute(select(InitialValues).where(InitialValues.user_id == user_id).order_by(InitialValues.created.desc()).limit(1))      
       row = result.fetchone()
 
-      # Проверяем, есть ли данные пользователя
       if not row:
          await message.answer("У вас нет сохраненных данных для расчета.")
          return
