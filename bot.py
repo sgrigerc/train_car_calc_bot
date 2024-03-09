@@ -22,11 +22,11 @@ dp.include_router(getting_values_router)
 
 
 #Ограничение типов апдейтов (входящих сообщений)
-ALLOWED_UPDATES = ['message, edited_message']
+# ALLOWED_UPDATES = ['message, edited_message']
 
 
 async def on_startup(bot):
-   
+
    run_param = False
    if run_param:
       await drop_db()
@@ -40,13 +40,12 @@ async def on_shutdown(bot):
 async def main():
    dp.startup.register(on_startup)
    dp.shutdown.register(on_shutdown)
-   
    dp.update.middleware(DataBaseSession(session_pool=session_maker))
    
    await create_db()
    await bot.delete_webhook(drop_pending_updates=True)
    await bot.set_my_commands(commands=private, scope=BotCommandScopeAllPrivateChats())
-   await dp.start_polling(bot, allowed_updates=ALLOWED_UPDATES)
+   await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 if __name__ == '__main__':
    logging.basicConfig(level=logging.INFO, stream=sys.stdout)

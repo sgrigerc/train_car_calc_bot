@@ -1,3 +1,4 @@
+from ast import Tuple
 import csv
 import tracemalloc
 from typing import Dict, Optional
@@ -12,7 +13,7 @@ from decimal import Decimal
 
 tracemalloc.start()
 
-async def calculation_of_intermediate_values(user_id: int, session: AsyncSession):
+async def calculation_of_intermediate_values(user_id: int, session: AsyncSession) -> Tuple:
    result = await session.execute(select(InitialValues).where(InitialValues.user_id == user_id))
    row = result.scalar_one_or_none()
    
@@ -43,6 +44,7 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
    
    csv_file_the_matrix = 'values_matrix.csv'
    the_rate_outside_the_transportation_process_per_POP = await getting_the_board_values(csv_file_the_matrix, the_number_of_days_of_downtime_at_the_station)
+   
    if the_rate_outside_the_transportation_process_per_POP:
    
       # cчитаем информацаию о разработанном плане 11 строка ексель
@@ -153,5 +155,4 @@ async def get_empty_mileage_rate(csv_file: str, empty_mileage_distance: float):
          if beginning <= empty_mileage_distance <= end:
             return tariff_scheme
    return 0
-
 

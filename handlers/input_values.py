@@ -2,11 +2,15 @@ from aiogram import F, Router, types
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
+from aiogram.types import InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import InitialValues
 from database.orm_query import orm_add_values
+
+from keyboards.inline import get_callback_btns
 
 
 calculator_router = Router()
@@ -118,14 +122,13 @@ async def ninth_value(message: types.Message, state: FSMContext):
 async def the_end_of_the_calculations(message: types.Message, state: FSMContext, session: AsyncSession):
    await state.update_data(travel_time_to_the_terminal=message.text)
    data = await state.get_data()
-   # user_id = data.get('user_id')
    try:
       await orm_add_values(session, data)
-      await message.answer("Данные получены!") 
       await state.clear()
+      await message.answer("Данные получены!", reply_markup=get_callback_btns(btns={'калькулировать': 'calculate'})) 
       
    except Exception as e:
-      await message.answer('Что то пошло не так...')
+      await message.answer('Что то пошло не так...') 
       await state.clear()
 
 
