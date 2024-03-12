@@ -62,11 +62,11 @@ class ResultValues(Base):
    the_rate_on_the_railway_tracks_19_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    the_rate_on_the_railway_tracks_19_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    the_rate_on_the_railway_tracks_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
-   the_rate_on_the_railway_tracks_19_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
-   the_rate_on_the_railway_tracks_19_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
-   the_rate_on_the_railway_tracks_25_1:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   the_rate_on_the_railway_tracks_19_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   the_rate_on_the_railway_tracks_19_25_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   the_rate_on_the_railway_tracks_25_2:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    the_rate_for_downtime_at_the_pnop_at_the_unloading_station:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
-   the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
+   idle_time_on_the_pnop_in_the_sludge_on_the_railway_network:Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
    
    def __init__(
       self,
@@ -84,7 +84,7 @@ class ResultValues(Base):
       the_rate_on_the_railway_tracks_19_25_2,
       the_rate_on_the_railway_tracks_25_2,
       the_rate_for_downtime_at_the_pnop_at_the_unloading_station,
-      the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network
+      idle_time_on_the_pnop_in_the_sludge_on_the_railway_network
    ):
       self.user_id = user_id
       self.trfdottpatusalt_19_1 = trfdottpatusalt_19_1
@@ -100,5 +100,5 @@ class ResultValues(Base):
       self.the_rate_on_the_railway_tracks_19_25_2 = the_rate_on_the_railway_tracks_19_25_2
       self.the_rate_on_the_railway_tracks_25_2 = the_rate_on_the_railway_tracks_25_2
       self.the_rate_for_downtime_at_the_pnop_at_the_unloading_station = the_rate_for_downtime_at_the_pnop_at_the_unloading_station
-      self.the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network
+      self.idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = idle_time_on_the_pnop_in_the_sludge_on_the_railway_network
 

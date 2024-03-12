@@ -1,24 +1,20 @@
-from ast import Tuple
+from typing import Dict
 import csv
 import tracemalloc
-from typing import Dict, Optional
 
-from sqlalchemy.orm import Session
+from aiogram.fsm.context import FSMContext
+
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.future import select
 
 from database.models import InitialValues, ResultValues
-from decimal import Decimal
 
 tracemalloc.start()
 
-async def calculation_of_intermediate_values(user_id: int, session: AsyncSession) -> Tuple:
+async def calculation_of_intermediate_values(user_id: int, session: AsyncSession) -> Dict[str, float]:
    result = await session.execute(select(InitialValues).where(InitialValues.user_id == user_id))
    row = result.scalar_one_or_none()
-   
-   print(row)
-   
+      
    if not row:
       raise ValueError(f"Не найдено данных для пользователя {user_id}")
    
@@ -76,7 +72,7 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
       return None
    
    the_rate_for_downtime_at_the_pnop_at_the_unloading_station = round(the_number_of_days_of_downtime_at_the_station * (the_cost_of_downtime_on_pnop + the_cost_of_the_car), 2)
-   the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = round(the_number_of_days_of_downtime_at_the_station * (the_cost_of_downtime_on_pnop + the_cost_of_the_car) + the_cost_of_an_empty_tariff + the_cost_of_the_car * travel_time_to_the_terminal, 2)
+   idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = round(the_number_of_days_of_downtime_at_the_station * (the_cost_of_downtime_on_pnop + the_cost_of_the_car) + the_cost_of_an_empty_tariff + the_cost_of_the_car * travel_time_to_the_terminal, 2)
    
    # Сохраняем результаты в новую таблицу
    result_values_instance = ResultValues(
@@ -94,28 +90,28 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
       the_rate_on_the_railway_tracks_19_25_2 = the_rate_on_the_railway_tracks_19_25_2,
       the_rate_on_the_railway_tracks_25_2 = the_rate_on_the_railway_tracks_25_2,
       the_rate_for_downtime_at_the_pnop_at_the_unloading_station = the_rate_for_downtime_at_the_pnop_at_the_unloading_station,
-      the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network,
+      idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = idle_time_on_the_pnop_in_the_sludge_on_the_railway_network,
       )
    
    session.add(result_values_instance)
    await session.commit()
    
-   return (
-            trfdottpatusalt_19_1,
-            trfdottpatusalt_19_25_1,
-            trfdottpatusalt_25_1,
-            trfdottpatusalt_19_2,
-            trfdottpatusalt_19_25_2,
-            trfdottpatusalt_25_2,
-            the_rate_on_the_railway_tracks_19_1,
-            the_rate_on_the_railway_tracks_19_25_1,
-            the_rate_on_the_railway_tracks_25_1,
-            the_rate_on_the_railway_tracks_19_2,
-            the_rate_on_the_railway_tracks_19_25_2,
-            the_rate_on_the_railway_tracks_25_2,
-            the_rate_for_downtime_at_the_pnop_at_the_unloading_station,
-            the_rate_for_idle_time_on_the_pnop_in_the_sludge_on_the_railway_network,
-            )
+   return {
+            'trfdottpatusalt_19_1' : trfdottpatusalt_19_1,
+            'trfdottpatusalt_19_25_1' : trfdottpatusalt_19_25_1,
+            'trfdottpatusalt_25_1' : trfdottpatusalt_25_1,
+            'trfdottpatusalt_19_2' : trfdottpatusalt_19_2,
+            'trfdottpatusalt_19_25_2' : trfdottpatusalt_19_25_2,
+            'trfdottpatusalt_25_2' : trfdottpatusalt_25_2,
+            'the_rate_on_the_railway_tracks_19_1' : the_rate_on_the_railway_tracks_19_1,
+            'the_rate_on_the_railway_tracks_19_25_1' : the_rate_on_the_railway_tracks_19_25_1,
+            'the_rate_on_the_railway_tracks_25_1' : the_rate_on_the_railway_tracks_25_1,
+            'the_rate_on_the_railway_tracks_19_2' : the_rate_on_the_railway_tracks_19_2,
+            'the_rate_on_the_railway_tracks_19_25_2' : the_rate_on_the_railway_tracks_19_25_2,
+            'the_rate_on_the_railway_tracks_25_2' : the_rate_on_the_railway_tracks_25_2,
+            'the_rate_for_downtime_at_the_pnop_at_the_unloading_station' : the_rate_for_downtime_at_the_pnop_at_the_unloading_station,
+            'idle_time_on_the_pnop_in_the_sludge_on_the_railway_network' : idle_time_on_the_pnop_in_the_sludge_on_the_railway_network,
+            }
 
 
 async def getting_the_board_values(csv_file: str, the_number_of_days_of_downtime_at_the_station: float):
@@ -155,4 +151,24 @@ async def get_empty_mileage_rate(csv_file: str, empty_mileage_distance: float):
          if beginning <= empty_mileage_distance <= end:
             return tariff_scheme
    return 0
+
+
+async def get_value_from_database(user_id: int, value_name: str, session: AsyncSession) -> float:
+   try:
+      result = await session.execute(
+         select(getattr(ResultValues, value_name)).where(ResultValues.user_id == user_id)
+      )
+      return result.scalar_one_or_none()
+   except Exception as e:
+      print(f"Ошибка в функции get_value_from_database: {str(e)}")
+      return None
+
+async def margin_calculation_func(values):
+   marginality_percentage = 0.15
+   values_float = [{'name': value['name'], 'value': float(value['value'])} for value in values]
+   marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]
+   margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
+   
+   return margin
+
 

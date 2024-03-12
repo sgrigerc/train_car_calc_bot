@@ -17,11 +17,16 @@ def get_callback_btns(
 
 
 async def buttons_with_values(user_id, session):
-   values = await calculation_of_intermediate_values(user_id, session)
-   keyboard = InlineKeyboardBuilder()
-   
-   for index, value in enumerate(values):
-      keyboard.add(InlineKeyboardButton(text=str(value), callback_data=f"value_{index + 1}"))
+   try:
+      values = await calculation_of_intermediate_values(user_id, session)
+      keyboard = InlineKeyboardBuilder()
+
+      for value_name, value in values.items():
+         keyboard.add(InlineKeyboardButton(text=str(value), callback_data=f"value_{value_name}"))
+      keyboard.add(InlineKeyboardButton(text="Рассчитать маржу", callback_data="calc_margin"))
       
-   return keyboard.adjust(1).as_markup()
+      return keyboard.adjust(1).as_markup()
+   except Exception as e:
+      print(f"Error in buttons_with_values: {str(e)}")
+      raise
 
