@@ -2,28 +2,24 @@ from aiogram import F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
-from sqlalchemy import desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
+from common.processing_input_values import get_value_from_database, calculate_margin_with_translations
 
-from common.processing_input_values import get_value_from_database, margin_calculation_func
-            
 from keyboards.inline import buttons_with_values
-from database.models import InitialValues, ResultValues
-from database.engine import engine, session_maker
-from decimal import Decimal
+from database.models import InitialValues
+from database.engine import engine
 
 
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
-
 getting_values_router = Router()
 
 @getting_values_router.callback_query(F.data.startswith('calculate'))
 async def calculate_handler(callback: types.CallbackQuery):
    user_id = callback.from_user.id
-   # Получаем данные из базы данных
+   # Получаем данные из бд
    async with SessionLocal() as session:
       result = await session.execute(select(InitialValues).where(InitialValues.user_id == user_id).order_by(InitialValues.created.desc()).limit(1))      
       row = result.fetchone()
@@ -47,13 +43,13 @@ async def margin_calculation(callback: types.CallbackQuery, state: FSMContext, s
    data = await state.get_data()
    values = data.get('values', [])
 
-   # Получаем значение из базы данных по названию
+   # Получаем значение из бд по названию
    value = await get_value_from_database(user_id, value_name, session)
 
    if value is not None:
       values.append({'name': value_name, 'value': value})
       await state.update_data(values=values)
-      await callback.answer(f'Значение блять: {value_name} - {value}')
+      await callback.answer(f'Значение: {value_name} - {value}')
    else:
       await callback.answer(f'Значение {value_name} не найдено в базе данных.')
 
@@ -66,12 +62,11 @@ async def calculate_the_margin(callback: types.CallbackQuery, session: AsyncSess
    
    if 'values' in data:
       values = data['values']
-      result = await margin_calculation_func(values)
-      result_str = "\n".join([f'{i + 1}. {value}' for i, value in enumerate(result)])
+      # result = await margin_calculation_func(values)
+      result_str = await calculate_margin_with_translations(values, state)
 
       # Отправка результата пользователю
       await callback.message.answer(f'Маржа:\n{result_str}')
-      # очистка значений
-      await state.update_data(values=None)
+      await state.clear()
    else:
       await callback.answer(f'Нет выбранных значений для расчета маржи.')

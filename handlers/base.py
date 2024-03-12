@@ -4,7 +4,6 @@ from aiogram.filters import CommandStart, Command
 
 base_router = Router()
 
-
 @base_router.message(CommandStart())
 async def start_cmd(message: types.Message):
    chat_id = message.chat.id

@@ -2,12 +2,9 @@ from aiogram import F, Router, types
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import InitialValues
 from database.orm_query import orm_add_values
 
 from keyboards.inline import get_callback_btns
@@ -43,8 +40,8 @@ async def first_value(message: types.Message, state: FSMContext):
 @calculator_router.message(StateFilter('*'), Command("отмена"))
 @calculator_router.message(StateFilter('*'), F.text.casefold() == "отмена")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
-   
    current_state = await state.get_state()
+   
    if current_state is None:
       return
    

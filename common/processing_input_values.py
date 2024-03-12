@@ -160,10 +160,35 @@ async def get_value_from_database(user_id: int, value_name: str, session: AsyncS
       )
       return result.scalar_one_or_none()
    except Exception as e:
-      print(f"Ошибка в функции get_value_from_database: {str(e)}")
+      print(f"Ошибка при получении значений: {str(e)}")
       return None
 
-async def margin_calculation_func(values):
+
+async def translate_names(values):
+   translations = {
+      'trfdottpatusalt_19_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: менее 19.6 м.',
+      'trfdottpatusalt_19_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: от 19.6 до 25.5 м.',
+      'trfdottpatusalt_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: 25.5 м. и более',
+      'trfdottpatusalt_19_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: менее 19.6 м.',
+      'trfdottpatusalt_19_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: от 19.6 до 25.5 м.',
+      'trfdottpatusalt_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: 25.5 м. и более',
+      'the_rate_on_the_railway_tracks_19_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: менее 19.6 м.',
+      'the_rate_on_the_railway_tracks_19_25_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: от 19.6 до 25.5 м.',
+      'the_rate_on_the_railway_tracks_25_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: 25.5 м. и более',
+      'the_rate_on_the_railway_tracks_19_2' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: менее 19.6 м.(2??)',
+      'the_rate_on_the_railway_tracks_19_25_2' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: от 19.6 до 25.5 м.(2??)',
+      'the_rate_on_the_railway_tracks_25_2' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: 25.5 м. и более(2??)',
+      'the_rate_for_downtime_at_the_pnop_at_the_unloading_station' : 'ставка за простой на пноп на станции выгрузки',
+      'idle_time_on_the_pnop_in_the_sludge_on_the_railway_network' : 'ставка за простой на пноп в отстое на сети жд',
+   }
+
+   #переводим в нормальный язык
+   translated_names = [translations.get(value['name'], value['name']) for value in values]
+
+   return translated_names
+
+
+async def margin_calculation_func(values, sate):
    marginality_percentage = 0.15
    values_float = [{'name': value['name'], 'value': float(value['value'])} for value in values]
    marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]
@@ -172,3 +197,11 @@ async def margin_calculation_func(values):
    return margin
 
 
+async def calculate_margin_with_translations(values, state):
+   translated_names = await translate_names(values)
+   result = await margin_calculation_func(values, state)
+
+   # Собираем строки с названием и рассчитанными значениями
+   result_str = "\n".join([f'{i + 1}. {name}: {margin}' for i, (name, margin) in enumerate(zip(translated_names, result))])
+
+   return result_str
