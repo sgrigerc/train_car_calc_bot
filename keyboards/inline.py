@@ -1,10 +1,11 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from common.processing_input_values import calculation_of_intermediate_values
+from misc.processing_input_values import calculation_of_intermediate_values
 
-def get_callback_btns(
-    *,
+
+async def get_callback_btns(
+   *,
    btns: dict[str, str],
    sizes: tuple[int] = (1,)):
 

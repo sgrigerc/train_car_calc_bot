@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
-from common.processing_input_values import get_value_from_database, calculate_margin_with_translations
+from misc.processing_input_values import get_value_from_database, calculate_margin_with_translations
 
 from keyboards.inline import buttons_with_values
 from database.models import InitialValues
@@ -16,6 +16,8 @@ from database.engine import engine
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 getting_values_router = Router()
 
+
+# 
 @getting_values_router.callback_query(F.data.startswith('calculate'))
 async def calculate_handler(callback: types.CallbackQuery):
    user_id = callback.from_user.id
@@ -54,7 +56,6 @@ async def margin_calculation(callback: types.CallbackQuery, state: FSMContext, s
       await callback.answer(f'Значение {value_name} не найдено в базе данных.')
 
 
-
 # обрабатываем значения
 @getting_values_router.callback_query(F.data.startswith('calc_margin'))
 async def calculate_the_margin(callback: types.CallbackQuery, session: AsyncSession, state: FSMContext):
@@ -62,7 +63,6 @@ async def calculate_the_margin(callback: types.CallbackQuery, session: AsyncSess
    
    if 'values' in data:
       values = data['values']
-      # result = await margin_calculation_func(values)
       result_str = await calculate_margin_with_translations(values, state)
 
       # Отправка результата пользователю

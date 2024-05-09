@@ -9,19 +9,21 @@ from aiogram import Router, F
 from database.engine import create_db, drop_db, session_maker
 from config.bot_config import bot, dp
 # from middlewares.db import CounterMiddleware
+from handlers.terminals import terminal_router
 from handlers.base import base_router
 from handlers.input_values import calculator_router
 from handlers.the_developed_solution import getting_values_router
-from common.bot_comman_list import private
+from misc.bot_comman_list import private
 from middlewares.db import DataBaseSession
 
 
 dp.include_router(base_router)
+dp.include_router(terminal_router)
 dp.include_router(calculator_router)
 dp.include_router(getting_values_router)
 
 
-#Ограничение типов апдейтов (входящих сообщений)
+# Ограничение типов апдейтов (входящих сообщений)
 # ALLOWED_UPDATES = ['message, edited_message']
 
 

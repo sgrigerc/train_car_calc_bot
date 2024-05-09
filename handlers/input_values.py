@@ -28,7 +28,7 @@ class CalculationOfCar(StatesGroup):
 
 #Машина состояний (FSM)
 #количество суток простоя на станции
-@calculator_router.message(StateFilter(None), Command('work'))
+@calculator_router.message(StateFilter(None), Command('select'))
 async def first_value(message: types.Message, state: FSMContext):
    user_id = message.from_user.id
    await message.answer("Введите количество суток простоя на станции:")

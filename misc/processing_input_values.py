@@ -31,33 +31,33 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
    indexing = indexing_values.get(year_of_indexing, 0)
    
    # получаем значение 'ставка за порожний рейс'
-   csv_file_empty_mileage_rate = 'matrix_the_rate_for_an_empty_flight.csv'
+   csv_file_empty_mileage_rate = 'misc/csv_files/matrix_the_rate_for_an_empty_flight.csv'
    empty_mileage_rate = await get_empty_mileage_rate(csv_file_empty_mileage_rate, empty_mileage_distance)
    
    the_cost_of_an_empty_tariff = indexing * empty_mileage_rate #стоимость порожнего тарифа(стоимость подсыла вагона)
    tariff_indexing = indexing   #индескация тарифа
    # the_rate_for_an_empty_flight_without_indexing = empty_mileage_rate   #ставка за порожний рейс без индексации
    
-   csv_file_the_matrix = 'values_matrix.csv'
+   csv_file_the_matrix = 'misc/csv_files/values_matrix.csv'
    the_rate_outside_the_transportation_process_per_POP = await getting_the_board_values(csv_file_the_matrix, the_number_of_days_of_downtime_at_the_station)
    
    if the_rate_outside_the_transportation_process_per_POP:
    
       # cчитаем информацаию о разработанном плане 11 строка ексель
       # ставка за простой на ПОП вне перевозочного процесса на станции выгрузки
-      x = the_number_of_days_of_downtime_at_the_station * tariff_indexing  #промежуточное0 чтобы 100 раз не считать
+      x = the_number_of_days_of_downtime_at_the_station * tariff_indexing  # промежуточное, чтобы 100 раз не считать
       
-      trfdottpatusalt_19_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_less_than_19'], 2)
-      trfdottpatusalt_19_25_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_from_19_to_25'], 2)
-      trfdottpatusalt_25_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_from_25'], 2)
-      trfdottpatusalt_19_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_less_than_19'], 2)
-      trfdottpatusalt_19_25_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_from_19_to_25'], 2)
-      trfdottpatusalt_25_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_from_25'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_19_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_less_than_19'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_19_25_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_from_19_to_25'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_25_1 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_from_25'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_19_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_less_than_19'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_19_25_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_from_19_to_25'], 2)
+      the_rate_is_beyond_the_stop_on_unloading_25_2 =  round(x * the_rate_outside_the_transportation_process_per_POP['at_unloading_stations_from_25'], 2)
       
       # 12 строка ексель
       # ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа)
-      # промежуточное0 чтобы 100 раз не считать 
       y = travel_time_to_the_station_on_the_railway_network * the_cost_of_the_car + the_number_of_days_of_downtime_at_the_station * tariff_indexing
+      
       
       the_rate_on_the_railway_tracks_19_1 = round(y * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_less_than_19'] + the_cost_of_an_empty_tariff, 2)
       the_rate_on_the_railway_tracks_19_25_1 = round(y * the_rate_outside_the_transportation_process_per_POP['at_transfer_stations_from_19_to_25'], 2)
@@ -77,12 +77,12 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
    # Сохраняем результаты в новую таблицу
    result_values_instance = ResultValues(
       user_id = user_id,
-      trfdottpatusalt_19_1 = trfdottpatusalt_19_1,
-      trfdottpatusalt_19_25_1 = trfdottpatusalt_19_25_1,
-      trfdottpatusalt_25_1 = trfdottpatusalt_25_1,
-      trfdottpatusalt_19_2 = trfdottpatusalt_19_2,
-      trfdottpatusalt_19_25_2 = trfdottpatusalt_19_25_2,
-      trfdottpatusalt_25_2 = trfdottpatusalt_25_2,
+      the_rate_is_beyond_the_stop_on_unloading_19_1 = the_rate_is_beyond_the_stop_on_unloading_19_1,
+      the_rate_is_beyond_the_stop_on_unloading_19_25_1 = the_rate_is_beyond_the_stop_on_unloading_19_25_1,
+      the_rate_is_beyond_the_stop_on_unloading_25_1 = the_rate_is_beyond_the_stop_on_unloading_25_1,
+      the_rate_is_beyond_the_stop_on_unloading_19_2 = the_rate_is_beyond_the_stop_on_unloading_19_2,
+      the_rate_is_beyond_the_stop_on_unloading_19_25_2 = the_rate_is_beyond_the_stop_on_unloading_19_25_2,
+      the_rate_is_beyond_the_stop_on_unloading_25_2 = the_rate_is_beyond_the_stop_on_unloading_25_2,
       the_rate_on_the_railway_tracks_19_1 = the_rate_on_the_railway_tracks_19_1,
       the_rate_on_the_railway_tracks_19_25_1 = the_rate_on_the_railway_tracks_19_25_1,
       the_rate_on_the_railway_tracks_25_1 = the_rate_on_the_railway_tracks_25_1,
@@ -97,12 +97,12 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
    await session.commit()
    
    return {
-            'trfdottpatusalt_19_1' : trfdottpatusalt_19_1,
-            'trfdottpatusalt_19_25_1' : trfdottpatusalt_19_25_1,
-            'trfdottpatusalt_25_1' : trfdottpatusalt_25_1,
-            'trfdottpatusalt_19_2' : trfdottpatusalt_19_2,
-            'trfdottpatusalt_19_25_2' : trfdottpatusalt_19_25_2,
-            'trfdottpatusalt_25_2' : trfdottpatusalt_25_2,
+            'the_rate_is_beyond_the_stop_on_unloading_19_1' : the_rate_is_beyond_the_stop_on_unloading_19_1,
+            'the_rate_is_beyond_the_stop_on_unloading_19_25_1' : the_rate_is_beyond_the_stop_on_unloading_19_25_1,
+            'the_rate_is_beyond_the_stop_on_unloading_25_1' : the_rate_is_beyond_the_stop_on_unloading_25_1,
+            'the_rate_is_beyond_the_stop_on_unloading_19_2' : the_rate_is_beyond_the_stop_on_unloading_19_2,
+            'the_rate_is_beyond_the_stop_on_unloading_19_25_2' : the_rate_is_beyond_the_stop_on_unloading_19_25_2,
+            'the_rate_is_beyond_the_stop_on_unloading_25_2' : the_rate_is_beyond_the_stop_on_unloading_25_2,
             'the_rate_on_the_railway_tracks_19_1' : the_rate_on_the_railway_tracks_19_1,
             'the_rate_on_the_railway_tracks_19_25_1' : the_rate_on_the_railway_tracks_19_25_1,
             'the_rate_on_the_railway_tracks_25_1' : the_rate_on_the_railway_tracks_25_1,
@@ -166,12 +166,12 @@ async def get_value_from_database(user_id: int, value_name: str, session: AsyncS
 
 async def translate_names(values):
    translations = {
-      'trfdottpatusalt_19_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: менее 19.6 м.',
-      'trfdottpatusalt_19_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: от 19.6 до 25.5 м.',
-      'trfdottpatusalt_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: 25.5 м. и более',
-      'trfdottpatusalt_19_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: менее 19.6 м.',
-      'trfdottpatusalt_19_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: от 19.6 до 25.5 м.',
-      'trfdottpatusalt_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: 25.5 м. и более',
+      'the_rate_is_beyond_the_stop_on_unloading_19_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: менее 19.6 м.',
+      'the_rate_is_beyond_the_stop_on_unloading_19_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: от 19.6 до 25.5 м.',
+      'the_rate_is_beyond_the_stop_on_unloading_25_1' : 'ставка за простой на поп вне перевозочного процесса на станциях перемещения при: 25.5 м. и более',
+      'the_rate_is_beyond_the_stop_on_unloading_19_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: менее 19.6 м.',
+      'the_rate_is_beyond_the_stop_on_unloading_19_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: от 19.6 до 25.5 м.',
+      'the_rate_is_beyond_the_stop_on_unloading_25_2' : 'ставка за простой на поп вне перевозочного процесса на станциях выгрузки при: 25.5 м. и более',
       'the_rate_on_the_railway_tracks_19_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: менее 19.6 м.',
       'the_rate_on_the_railway_tracks_19_25_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: от 19.6 до 25.5 м.',
       'the_rate_on_the_railway_tracks_25_1' : 'ставка за простой на поп вне перевозочного процесса на сети жд (+стоимость порожнего тарифа) при: 25.5 м. и более',
