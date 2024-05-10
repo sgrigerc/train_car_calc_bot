@@ -13,24 +13,24 @@ class Terminals(Base):
    __tablename__ = 'terminals'
    
    user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-   Beliy_Rast: Mapped[int] = mapped_column(Integer, nullable=True)
-   Elektrougli: Mapped[int] = mapped_column(Integer, nullable=True)
-   Vorsino: Mapped[int] = mapped_column(Integer, nullable=True)
-   Selyatino: Mapped[int] = mapped_column(Integer, nullable=True)
-   Khovrino: Mapped[int] = mapped_column(Integer, nullable=True)
-   Ramenskoye: Mapped[int] = mapped_column(Integer, nullable=True)
-   Lyubertsy: Mapped[int] = mapped_column(Integer, nullable=True)
+   Beliy_Rast: Mapped[int] = mapped_column(Integer, default=0)
+   Elektrougli: Mapped[int] = mapped_column(Integer, default=0)
+   Vorsino: Mapped[int] = mapped_column(Integer, default=0)
+   Selyatino: Mapped[int] = mapped_column(Integer, default=0)
+   Khovrino: Mapped[int] = mapped_column(Integer, default=0)
+   Ramenskoye: Mapped[int] = mapped_column(Integer, default=0)
+   Lyubertsy: Mapped[int] = mapped_column(Integer, default=0)
    
    def __init__(
       self, 
       user_id,
-      Beliy_Rast,
-      Elektrougli,
-      Vorsino,
-      Selyatino,
-      Khovrino,
-      Ramenskoye,
-      Lyubertsy
+      Beliy_Rast=0,
+      Elektrougli=0,
+      Vorsino=0,
+      Selyatino=0,
+      Khovrino=0,
+      Ramenskoye=0,
+      Lyubertsy=0
    ):
       self.user_id = user_id
       self.Beliy_Rast = Beliy_Rast

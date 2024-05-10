@@ -205,3 +205,5 @@ async def calculate_margin_with_translations(values, state):
    result_str = "\n".join([f'{i + 1}. {name}: {margin}' for i, (name, margin) in enumerate(zip(translated_names, result))])
 
    return result_str
+
+
