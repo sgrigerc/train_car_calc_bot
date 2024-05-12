@@ -2,8 +2,6 @@ from typing import Dict
 import csv
 import tracemalloc
 
-from aiogram.fsm.context import FSMContext
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -36,7 +34,6 @@ async def calculation_of_intermediate_values(user_id: int, session: AsyncSession
    
    the_cost_of_an_empty_tariff = indexing * empty_mileage_rate #стоимость порожнего тарифа(стоимость подсыла вагона)
    tariff_indexing = indexing   #индескация тарифа
-   # the_rate_for_an_empty_flight_without_indexing = empty_mileage_rate   #ставка за порожний рейс без индексации
    
    csv_file_the_matrix = 'misc/csv_files/values_matrix.csv'
    the_rate_outside_the_transportation_process_per_POP = await getting_the_board_values(csv_file_the_matrix, the_number_of_days_of_downtime_at_the_station)

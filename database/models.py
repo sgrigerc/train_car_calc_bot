@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime , Float, func, BigInteger, Integer
+from sqlalchemy import DateTime , Float, Integer, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -7,6 +7,25 @@ class Base(DeclarativeBase):
 
    def __init__(self, created=None):
       self.created = created
+
+
+class Delta(Base):
+   __tablename__ = 'delta'
+   
+   user_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+   selected_terminal: Mapped[str] = mapped_column(String(40), default=0)
+   delta: Mapped[int] = mapped_column(Integer, default=0)
+   
+   def __init__(
+      self, 
+      user_id,
+      selected_terminal,
+      delta,
+
+   ):
+      self.user_id = user_id
+      self.selected_terminal = selected_terminal
+      self.delta = delta
 
 
 class Terminals(Base):

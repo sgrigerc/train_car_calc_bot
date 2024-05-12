@@ -6,26 +6,32 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.engine import engine
+from database.orm_query import save_delta_to_database
 from keyboards.inline import get_callback_btns
-from misc.processing_terminals import processing_terminals_button, user_buttons
+from misc.processing_terminals import (processing_terminals_button,
+                                       user_buttons, 
+                                       get_selected_terminals, 
+                                       calculate_date_delta,
+                                       )
 
 
 terminal_router = Router()
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-#хранение нажатых кнопок
-# user_buttons = {}
+all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy'}
+
 
 class TerminalState(StatesGroup):
-   names_of_terminals = State()  #терминалы
+   user_id = State()
+   selected_terminal = State()   #выьранный терминал
    date_of_readiness_ps = State()   # дата готовности пс
-   planned_loading = State()  # плановая дата
+   loading_date = State()  # плановая дата погрузки
 
 
-# даем пользователю список терминалов
-@terminal_router.message(Command('work'))
-async def names_of_terminals(message: types.Message, session: AsyncSession):
-   await message.answer("Выберите терминал:", reply_markup=await get_callback_btns(btns={
+# выводим пользователю список терминалов
+@terminal_router.message(StateFilter(None), Command('work'))
+async def names_of_terminals(message: types.Message):
+   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns={
          'Белый Раст': 'Beliy_Rast', 
          'Электроугли': 'Elektrougli', 
          'Ворсино': 'Vorsino',
@@ -33,61 +39,48 @@ async def names_of_terminals(message: types.Message, session: AsyncSession):
          'Ховрино': 'Khovrino',
          'Раменское': 'Ramenskoye',
          'Люберцы': 'Lyubertsy',
-         'Далее': 'next'
+         # 'Далее': 'next'
       })) 
 
 
 # принимаем от пользователя терминалы (обработка нажимаемых кнопок)
-@terminal_router.callback_query(F.data.in_({'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy', 'next'}))
-async def processing_of_select_terminals(callback: types.CallbackQuery, state: FSMContext, session: AsyncSession):
+@terminal_router.callback_query(StateFilter(None), F.data.in_(all_terminals))  #F.data.in_(all_terminals)
+async def processing_of_select_terminals(callback: types.CallbackQuery, state: FSMContext, session: AsyncSession,):
    async with AsyncSession() as session:
-      button_data = callback.data
       user_id = callback.from_user.id
       
-      if button_data != 'next':
-         if user_id not in user_buttons:
-            user_buttons[user_id] = set()
-         user_buttons[user_id].add(button_data)
-      else:
-         #проверка выбранных терминалов
-         all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy', 'next'}
-         chosen_terminals = user_buttons.get(user_id, set())
-         missing_terminals = all_terminals - chosen_terminals
-         user_buttons[user_id] != missing_terminals
-         
-         await processing_terminals_button(user_id, session)
+      # запись в БД terminals выбранный теримнал
+      # await processing_terminals_button(user_id, session)
       
-      await callback.answer("Принял терминал")
+      await state.update_data(user_id=user_id)
+      await state.update_data(selected_terminal = callback.data)
+      await callback.message.answer(f"Дата готовности подвижного состава (день.месяц):")
+      await state.set_state(TerminalState.date_of_readiness_ps)
+
+
+# Принимаем дату готовности ПС
+@terminal_router.message(TerminalState.date_of_readiness_ps, F.text)
+async def handler_date_of_readiness(message: types.Message, state: FSMContext, session: AsyncSession):
+   await state.update_data(date_of_readiness=message.text)
+   await message.answer(f"Плановая дата погрузки (день.месяц)")
+   await state.set_state(TerminalState.loading_date)
+
+
+# принимаем планову дату погрузки и рассчитываем дельта
+@terminal_router.message(TerminalState.loading_date, F.text)
+async def handle_of_loading_dates(message: types.Message, state: FSMContext, session: AsyncSession):
+   user_id = message.from_user.id
+   loading_date = message.text
+
+   data = await state.get_data()
+   selected_terminal = data['selected_terminal']
+   date_of_readiness = data['date_of_readiness']
    
-   # terminal_name = callback.data
-   # data = await state.get_data()
-   # chosen_terminals = data.get('chosen_terminals', [])
-   # chosen_terminals.append(terminal_name)
+   try:
+      delta = await calculate_date_delta(date_of_readiness, loading_date)
+      data['delta'] = delta
+      await save_delta_to_database(session, selected_terminal, delta, data)
+      await message.answer("Дельта сохранена!")
    
-   # await state.update_data(chosen_terminals=chosen_terminals)
-
-@terminal_router.message(F.data.in_(['next']))
-async def handler_date_of_readiness(callback: types.CallbackQuery, state: FSMContext):
-   await callback.message.answer('Дата готовности подвижного состава?')
-   await TerminalState.date_of_readiness_ps.set()
-
-# принимаем готовность пс
-@terminal_router.message(TerminalState.date_of_readiness_ps)
-async def handle_first_number(message: types.Message, state: FSMContext):
-   first_number = message.text
-   await state.update_data(first_number=first_number)
-   await message.answer("Плановая дата погрузки?")
-   await TerminalState.planned_loading.set()
-
-
-# принимаем плановую дату погрузки
-@terminal_router.message(TerminalState.planned_loading)
-async def handle_second_number(message: types.Message, state: FSMContext):
-   second_number = message.text
-   await state.update_data(second_number=second_number)
-   await message.answer("Данные сохранены. Можете продолжить.")
-   await state.finish()
-
-
-
-
+   except Exception as e:
+      await message.answer("Ошибка при расчетах. Пожалуйста попробуйте снова")

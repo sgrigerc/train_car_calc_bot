@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import InitialValues
+from database.models import InitialValues, Delta
 
 
 async def orm_add_values(session: AsyncSession, data: dict):
@@ -18,3 +18,18 @@ async def orm_add_values(session: AsyncSession, data: dict):
       )
    session.add(obj)
    await session.commit()
+   
+
+# Сохраняем дельту
+async def save_delta_to_database(session: AsyncSession, selected_terminal: str, delta: int, data: dict):
+   try:
+      delta_obj = Delta(
+                  int(data['user_id']), 
+                  str(data['selected_terminal']), 
+                  int(data['delta'])
+                  )
+      session.add(delta_obj)
+      await session.commit()
+   except Exception as e:
+      print(f"Ошибка при сохранении в БД: {e}")
+      await session.rollback()
