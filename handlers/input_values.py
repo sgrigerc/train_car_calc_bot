@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.orm_query import orm_add_values
-
+from misc.processing_input_values import comparizon_with_delta
 from keyboards.inline import get_callback_btns
 
 
@@ -110,22 +110,26 @@ async def eleventh_value(message: types.Message, state: FSMContext):
 async def ninth_value(message: types.Message, state: FSMContext):
    await state.update_data(year_of_indexing=message.text)
    await message.answer("Введите время хода до терминала (в днях):")
-   
    await state.set_state(CalculationOfCar.travel_time_to_the_terminal)
 
 
 #сохраняем полученные данные ( вылезает кнопка готово)
 @calculator_router.message(CalculationOfCar.travel_time_to_the_terminal, F.text)
 async def the_end_of_the_calculations(message: types.Message, state: FSMContext, session: AsyncSession):
+   user_id = message.from_user.id
    await state.update_data(travel_time_to_the_terminal=message.text)
    data = await state.get_data()
+   
    try:
+      travel_time_to_the_terminal = int(data['travel_time_to_the_terminal'])
+      message_delta = await comparizon_with_delta(user_id, session, travel_time_to_the_terminal)
       await orm_add_values(session, data)
       await state.clear()
-      await message.answer("Данные получены!", reply_markup=get_callback_btns(btns={'калькулировать': 'calculate'})) 
+      reply_markup = await get_callback_btns(btns={'калькулировать': 'calculate'})
+      await message.answer(message_delta, reply_markup=reply_markup) 
       
    except Exception as e:
-      await message.answer('Что то пошло не так...') 
+      await message.answer(f'Что то пошло не так... {e}') 
       await state.clear()
 
 

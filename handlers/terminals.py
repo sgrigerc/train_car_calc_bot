@@ -11,7 +11,7 @@ from keyboards.inline import get_callback_btns
 from misc.processing_terminals import (processing_terminals_button,
                                        terminal_buttons,
                                        user_buttons, 
-                                       get_selected_terminals, 
+                                       # get_selected_terminals, 
                                        calculate_date_delta,
                                        )
 
@@ -88,4 +88,4 @@ async def handle_of_loading_dates(message: types.Message, state: FSMContext, ses
    
    except Exception as e:
       await message.answer(f"Ошибка при расчетах. Пожалуйста попробуйте снова({e})")
-      await state.clear()
+      

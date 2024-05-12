@@ -51,16 +51,16 @@ async def processing_terminals_button(user_id: int, session: AsyncSession):
       user_buttons.pop(user_id, None)
 
 
-async def get_selected_terminals(user_id: int, session: AsyncSession) -> List[str]:
-      selected_terminals = []
-      user_data = await session.execute(select(Terminals).where(Terminals.user_id == user_id).limit(1))
-      user_data = user_data.fetchone()
+# async def get_selected_terminals(user_id: int, session: AsyncSession) -> List[str]:
+#       selected_terminals = []
+#       user_data = await session.execute(select(Terminals).where(Terminals.user_id == user_id).limit(1))
+#       user_data = user_data.fetchone()
       
-      if user_data:
-         for terminal_column in ['Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy']:
-            if hasattr(user_data,terminal_column) and getattr(user_data, terminal_column) == 1:
-               selected_terminals.append(terminal_column)
-      return selected_terminals
+#       if user_data:
+#          for terminal_column in ['Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy']:
+#             if hasattr(user_data,terminal_column) and getattr(user_data, terminal_column) == 1:
+#                selected_terminals.append(terminal_column)
+#       return selected_terminals
 
 
 # вычисляем количество дней (Дельта между датой погрузки ПС и плановой даты погрузки)

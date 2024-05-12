@@ -61,7 +61,7 @@ class Terminals(Base):
       self.Lyubertsy = Lyubertsy
 
 
-class InitialValues(object):
+class InitialValues(Base):     #object при множестве таблиц
    __tablename__ = 'i_values'
    
    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -156,29 +156,29 @@ class ResultValues(Base):
       self.idle_time_on_the_pnop_in_the_sludge_on_the_railway_network = idle_time_on_the_pnop_in_the_sludge_on_the_railway_network
 
 
-class InitialValuesBeliyRast(InitialValues, Base):
-   __tablename__ = 'i_values_Beliy_rast'
+# class InitialValuesBeliyRast(InitialValues, Base):
+#    __tablename__ = 'i_values_Beliy_rast'
 
 
-class InitialValuesElektrougli(InitialValues, Base):
-   __tablename__ = 'i_values_Elektrougli'
+# class InitialValuesElektrougli(InitialValues, Base):
+#    __tablename__ = 'i_values_Elektrougli'
 
 
-class InitialValuesVorsino(InitialValues, Base):
-   __tablename__ = 'i_values_Vorsino'
+# class InitialValuesVorsino(InitialValues, Base):
+#    __tablename__ = 'i_values_Vorsino'
 
 
-class InitialValuesSelyatino(InitialValues, Base):
-   __tablename__ = 'i_values_Selyatino'
+# class InitialValuesSelyatino(InitialValues, Base):
+#    __tablename__ = 'i_values_Selyatino'
 
 
-class InitialValuesKhovrino(InitialValues, Base):
-   __tablename__ = 'i_values_Khovrino'
+# class InitialValuesKhovrino(InitialValues, Base):
+#    __tablename__ = 'i_values_Khovrino'
 
 
-class InitialValuesRamenskoye(InitialValues, Base):
-   __tablename__ = 'i_values_Ramenskoye'
+# class InitialValuesRamenskoye(InitialValues, Base):
+#    __tablename__ = 'i_values_Ramenskoye'
 
 
-class InitialValuesLyubertsy(InitialValues, Base):
-   __tablename__ = 'i_values_Lyubertsy'
+# class InitialValuesLyubertsy(InitialValues, Base):
+#    __tablename__ = 'i_values_Lyubertsy'

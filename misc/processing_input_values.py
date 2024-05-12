@@ -5,9 +5,23 @@ import tracemalloc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from database.models import InitialValues, ResultValues
+from database.models import InitialValues, ResultValues, Delta
 
 tracemalloc.start()
+
+async def comparizon_with_delta(user_id: int, session: AsyncSession, travel_time_to_the_terminal: int):
+   result = await session.execute(select(Delta).where(Delta.user_id == user_id))
+   row = result.scalar_one_or_none()
+   if not row:
+      raise ValueError(f"Не найдено данных для пользователя {user_id}")
+   
+   delta = int(row.delta)
+   
+   if travel_time_to_the_terminal > delta:
+      return "Предупреждение: время хода до терминала превышает дельту. Данные получены!"
+   else:
+      return "Дельта не превысила время хода до терминала. Данные получены!"
+
 
 async def calculation_of_intermediate_values(user_id: int, session: AsyncSession) -> Dict[str, float]:
    result = await session.execute(select(InitialValues).where(InitialValues.user_id == user_id))
@@ -196,7 +210,7 @@ async def margin_calculation_func(values):
 
 async def calculate_margin_with_translations(values, state):
    translated_names = await translate_names(values)
-   result = await margin_calculation_func(values, state)
+   result = await margin_calculation_func(values)
 
    # Собираем строки с названием и рассчитанными значениями
    result_str = "\n".join([f'{i + 1}. {name}: {margin}' for i, (name, margin) in enumerate(zip(translated_names, result))])
