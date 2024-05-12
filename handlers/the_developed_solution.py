@@ -51,22 +51,28 @@ async def margin_calculation(callback: types.CallbackQuery, state: FSMContext, s
    if value is not None:
       values.append({'name': value_name, 'value': value})
       await state.update_data(values=values)
-      await callback.answer(f'Значение: {value_name} - {value}')
+      await callback.message.answer(f'Значение: {value_name} - {value}')
    else:
       await callback.answer(f'Значение {value_name} не найдено в базе данных.')
 
 
+@getting_values_router.callback_query(F.data.startswith('percent_margin'))
+async def margin_value(callback: types.CallbackQuery, state: FSMContext):
+   await callback.message.answer("Введите маржу: (%/р)")
+
+
 # обрабатываем значения
-@getting_values_router.callback_query(F.data.startswith('calc_margin'))
-async def calculate_the_margin(callback: types.CallbackQuery, session: AsyncSession, state: FSMContext):
+@getting_values_router.message(F.text)
+async def calculate_the_margin(message: types.Message, session: AsyncSession, state: FSMContext):
+   marginality = float(message.text)
    data = await state.get_data()
    
    if 'values' in data:
       values = data['values']
-      result_str = await calculate_margin_with_translations(values, state)
+      result_str = await calculate_margin_with_translations(values, marginality)
 
       # Отправка результата пользователю
-      await callback.message.answer(f'Маржа:\n{result_str}')
+      await message.answer(f'Маржа:\n{result_str}')
       await state.clear()
    else:
-      await callback.answer(f'Нет выбранных значений для расчета маржи.')
+      await message.answer(f'Нет выбранных значений для расчета маржи.')

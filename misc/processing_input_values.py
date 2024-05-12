@@ -199,18 +199,23 @@ async def translate_names(values):
    return translated_names
 
 
-async def margin_calculation_func(values):
-   marginality_percentage = 0.15
+async def margin_calculation_func(values, marginality_percentage):   
    values_float = [{'name': value['name'], 'value': float(value['value'])} for value in values]
-   marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]
-   margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
    
+   if float(marginality_percentage) < 100:
+      marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]
+      margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
+      
+   else:
+      marginality = [round(value['value'] + marginality_percentage, 2) for value in values_float]
+      margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
+      print (f"значение value {values}")
    return margin
 
 
 async def calculate_margin_with_translations(values, state):
    translated_names = await translate_names(values)
-   result = await margin_calculation_func(values)
+   result = await margin_calculation_func(values, state)
 
    # Собираем строки с названием и рассчитанными значениями
    result_str = "\n".join([f'{i + 1}. {name}: {margin}' for i, (name, margin) in enumerate(zip(translated_names, result))])
