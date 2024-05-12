@@ -28,16 +28,16 @@ class CalculationOfCar(StatesGroup):
 
 #Машина состояний (FSM)
 #количество суток простоя на станции
-@calculator_router.message(StateFilter(None), Command('select'))
-async def first_value(message: types.Message, state: FSMContext):
-   user_id = message.from_user.id
-   await message.answer("Введите количество суток простоя на станции:")
+@calculator_router.callback_query(StateFilter(None), F.data.startswith('next'))
+async def first_value(callback: types.CallbackQuery, state: FSMContext):
+   user_id = callback.from_user.id
+   await callback.message.answer("Введите количество суток простоя на станции:")
    await state.set_state(CalculationOfCar.the_number_of_days_of_downtime_at_the_station)
    await state.update_data(user_id=user_id)
 
 
 #отмена действий
-@calculator_router.message(StateFilter('*'), Command("отмена"))
+@calculator_router.message(StateFilter('*'), Command("otmena"))
 @calculator_router.message(StateFilter('*'), F.text.casefold() == "отмена")
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
    current_state = await state.get_state()
@@ -55,7 +55,6 @@ async def second_value(message: types.Message, state: FSMContext):
    await state.update_data(the_number_of_days_of_downtime_at_the_station=message.text)
    await message.answer("Введите время простоя на терминале до погрузки:")
    await state.set_state(CalculationOfCar.idle_time_at_the_terminal_before_loading)
-
 
 
 #стоимость простоя пноп
@@ -111,6 +110,7 @@ async def eleventh_value(message: types.Message, state: FSMContext):
 async def ninth_value(message: types.Message, state: FSMContext):
    await state.update_data(year_of_indexing=message.text)
    await message.answer("Введите время хода до терминала (в днях):")
+   
    await state.set_state(CalculationOfCar.travel_time_to_the_terminal)
 
 

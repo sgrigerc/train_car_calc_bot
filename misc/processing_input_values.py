@@ -185,7 +185,7 @@ async def translate_names(values):
    return translated_names
 
 
-async def margin_calculation_func(values, sate):
+async def margin_calculation_func(values):
    marginality_percentage = 0.15
    values_float = [{'name': value['name'], 'value': float(value['value'])} for value in values]
    marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]

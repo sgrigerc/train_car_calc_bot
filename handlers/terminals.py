@@ -9,6 +9,7 @@ from database.engine import engine
 from database.orm_query import save_delta_to_database
 from keyboards.inline import get_callback_btns
 from misc.processing_terminals import (processing_terminals_button,
+                                       terminal_buttons,
                                        user_buttons, 
                                        get_selected_terminals, 
                                        calculate_date_delta,
@@ -31,17 +32,20 @@ class TerminalState(StatesGroup):
 # выводим пользователю список терминалов
 @terminal_router.message(StateFilter(None), Command('work'))
 async def names_of_terminals(message: types.Message):
-   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns={
-         'Белый Раст': 'Beliy_Rast', 
-         'Электроугли': 'Elektrougli', 
-         'Ворсино': 'Vorsino',
-         'Селятино': 'Selyatino',
-         'Ховрино': 'Khovrino',
-         'Раменское': 'Ramenskoye',
-         'Люберцы': 'Lyubertsy',
-         # 'Далее': 'next'
-      })) 
+   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns=terminal_buttons)) 
 
+
+#отмена действий
+@terminal_router.message(StateFilter('*'), Command("отмена"))
+@terminal_router.message(StateFilter('*'), F.text.casefold() == "отмена")
+async def cancel_handler(message: types.Message, state: FSMContext) -> None:
+   current_state = await state.get_state()
+   
+   if current_state is None:
+      return
+   
+   await state.clear()
+   await message.answer("Действия отменены")
 
 # принимаем от пользователя терминалы (обработка нажимаемых кнопок)
 @terminal_router.callback_query(StateFilter(None), F.data.in_(all_terminals))  #F.data.in_(all_terminals)
@@ -69,7 +73,6 @@ async def handler_date_of_readiness(message: types.Message, state: FSMContext, s
 # принимаем планову дату погрузки и рассчитываем дельта
 @terminal_router.message(TerminalState.loading_date, F.text)
 async def handle_of_loading_dates(message: types.Message, state: FSMContext, session: AsyncSession):
-   user_id = message.from_user.id
    loading_date = message.text
 
    data = await state.get_data()
@@ -80,7 +83,9 @@ async def handle_of_loading_dates(message: types.Message, state: FSMContext, ses
       delta = await calculate_date_delta(date_of_readiness, loading_date)
       data['delta'] = delta
       await save_delta_to_database(session, selected_terminal, delta, data)
-      await message.answer("Дельта сохранена!")
+      await state.clear()
+      await message.answer("Дельта сохранена!", reply_markup = await get_callback_btns(btns={'Далее': 'next'}))
    
    except Exception as e:
-      await message.answer("Ошибка при расчетах. Пожалуйста попробуйте снова")
+      await message.answer(f"Ошибка при расчетах. Пожалуйста попробуйте снова({e})")
+      await state.clear()

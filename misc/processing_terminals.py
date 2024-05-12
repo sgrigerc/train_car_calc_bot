@@ -8,12 +8,21 @@ from sqlalchemy.orm import sessionmaker
 from database.engine import engine
 from datetime import datetime
 from typing import List
-# from handlers.terminals import all_terminals
 
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 #хранение нажатых кнопок
 user_buttons = {}
+terminal_buttons = {
+         'Белый Раст': 'Beliy_Rast', 
+         'Электроугли': 'Elektrougli', 
+         'Ворсино': 'Vorsino',
+         'Селятино': 'Selyatino',
+         'Ховрино': 'Khovrino',
+         'Раменское': 'Ramenskoye',
+         'Люберцы': 'Lyubertsy',
+         # 'Далее': 'next'
+      }
 all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy'}
 
 
@@ -38,18 +47,15 @@ async def processing_terminals_button(user_id: int, session: AsyncSession):
          
       await session.commit()
       await session.close()
-         
+      
       user_buttons.pop(user_id, None)
 
 
-async def get_selected_terminals(user_id: int, session: AsyncSession) -> List[str]:     #-> List[str]
-   async with SessionLocal() as session:
+async def get_selected_terminals(user_id: int, session: AsyncSession) -> List[str]:
       selected_terminals = []
       user_data = await session.execute(select(Terminals).where(Terminals.user_id == user_id).limit(1))
       user_data = user_data.fetchone()
       
-      # if user_data and user_data.scalar():
-      #    user_data = user_data.scalar().first()
       if user_data:
          for terminal_column in ['Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy']:
             if hasattr(user_data,terminal_column) and getattr(user_data, terminal_column) == 1:

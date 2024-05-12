@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder 
 
 from misc.processing_input_values import calculation_of_intermediate_values
 
@@ -31,3 +31,6 @@ async def buttons_with_values(user_id, session):
       print(f"Error in buttons_with_values: {str(e)}")
       raise
 
+# inline_keyboard = InlineKeyboardMarkup(row_width=1)
+# next_button = InlineKeyboardButton("Далее", callback_data="next_command")
+# inline_keyboard.add(next_button)
