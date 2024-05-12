@@ -26,7 +26,6 @@ class CalculationOfCar(StatesGroup):
    travel_time_to_the_terminal = State()    #время хода до терминала (в днях)
 
 
-#Машина состояний (FSM)
 #количество суток простоя на станции
 @calculator_router.callback_query(StateFilter(None), F.data.startswith('next'))
 async def first_value(callback: types.CallbackQuery, state: FSMContext):
@@ -131,5 +130,4 @@ async def the_end_of_the_calculations(message: types.Message, state: FSMContext,
    except Exception as e:
       await message.answer(f'Что то пошло не так... {e}') 
       await state.clear()
-
 

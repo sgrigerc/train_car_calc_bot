@@ -202,14 +202,13 @@ async def translate_names(values):
 async def margin_calculation_func(values, marginality_percentage):   
    values_float = [{'name': value['name'], 'value': float(value['value'])} for value in values]
    
-   if float(marginality_percentage) < 100:
+   if float(marginality_percentage) <= 100:
       marginality = [round(value['value'] * (1 + marginality_percentage), 2) for value in values_float]
-      margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
-      
    else:
       marginality = [round(value['value'] + marginality_percentage, 2) for value in values_float]
-      margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
-      print (f"значение value {values}")
+      
+   margin = [round(marginality_value - float(value['value']), 2) for value, marginality_value in zip(values_float, marginality)]
+   
    return margin
 
 

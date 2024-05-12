@@ -51,7 +51,7 @@ async def margin_calculation(callback: types.CallbackQuery, state: FSMContext, s
    if value is not None:
       values.append({'name': value_name, 'value': value})
       await state.update_data(values=values)
-      await callback.message.answer(f'Значение: {value_name} - {value}')
+      await callback.answer(f'Значение: {value_name} - {value}')
    else:
       await callback.answer(f'Значение {value_name} не найдено в базе данных.')
 

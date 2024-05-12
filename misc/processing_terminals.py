@@ -1,13 +1,10 @@
-from aiogram.fsm.context import FSMContext
-from aiogram import types
-
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.models import Terminals
 from sqlalchemy.orm import sessionmaker
 from database.engine import engine
 from datetime import datetime
-from typing import List
+
 
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -26,6 +23,7 @@ terminal_buttons = {
 all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy'}
 
 
+# сохранение выбранного терминала в таблицу Terminals
 async def processing_terminals_button(user_id: int, session: AsyncSession):
    async with SessionLocal() as session:
       chosen_terminals = user_buttons.get(user_id, set())
