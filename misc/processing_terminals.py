@@ -1,9 +1,10 @@
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database.models import Terminals
 from sqlalchemy.orm import sessionmaker
-from database.engine import engine
 from datetime import datetime
+
+from database.models import Terminals
+from database.engine import engine
 
 
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)

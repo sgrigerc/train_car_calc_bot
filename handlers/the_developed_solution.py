@@ -1,5 +1,4 @@
 from aiogram import F, Router, types
-from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +6,6 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
 from misc.processing_input_values import get_value_from_database, calculate_margin_with_translations
-
 from keyboards.inline import buttons_with_values
 from database.models import InitialValues
 from database.engine import engine
