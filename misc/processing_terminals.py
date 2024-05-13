@@ -45,7 +45,7 @@ async def processing_terminals_button(user_id: int, session: AsyncSession):
 #       user_data = user_data.fetchone()
       
 #       if user_data:
-#          for terminal_column in all_terminals:
+#          for terminal_column in ['Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy']:
 #             if hasattr(user_data,terminal_column) and getattr(user_data, terminal_column) == 1:
 #                selected_terminals.append(terminal_column)
 #       return selected_terminals

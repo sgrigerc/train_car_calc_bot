@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database.engine import engine
 from database.orm_query import save_delta_to_database
 from keyboards.inline import get_callback_btns
+from keyboards.inline import terminal_buttons
 from misc.processing_terminals import (processing_terminals_button,
                                        all_terminals,
-                                       user_buttons, 
                                        # get_selected_terminals, 
                                        calculate_date_delta,
                                        )
@@ -30,7 +30,7 @@ class TerminalState(StatesGroup):
 # выводим пользователю список терминалов
 @terminal_router.message(StateFilter(None), Command('work'))
 async def names_of_terminals(message: types.Message):
-   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns=all_terminals)) 
+   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns=terminal_buttons)) 
 
 
 #отмена действий

@@ -3,6 +3,16 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from misc.processing_input_values import calculation_of_intermediate_values, translate_names
 
+terminal_buttons = {
+         'Белый Раст': 'Beliy_Rast', 
+         'Электроугли': 'Elektrougli', 
+         'Ворсино': 'Vorsino',
+         'Селятино': 'Selyatino',
+         'Ховрино': 'Khovrino',
+         'Раменское': 'Ramenskoye',
+         'Люберцы': 'Lyubertsy',
+         # 'Далее': 'next'
+      }
 
 async def get_callback_btns(
    *,
