@@ -10,16 +10,6 @@ SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=F
 
 #хранение нажатых кнопок
 user_buttons = {}
-terminal_buttons = {
-         'Белый Раст': 'Beliy_Rast', 
-         'Электроугли': 'Elektrougli', 
-         'Ворсино': 'Vorsino',
-         'Селятино': 'Selyatino',
-         'Ховрино': 'Khovrino',
-         'Раменское': 'Ramenskoye',
-         'Люберцы': 'Lyubertsy',
-         # 'Далее': 'next'
-      }
 all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy'}
 
 
@@ -55,7 +45,7 @@ async def processing_terminals_button(user_id: int, session: AsyncSession):
 #       user_data = user_data.fetchone()
       
 #       if user_data:
-#          for terminal_column in ['Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy']:
+#          for terminal_column in all_terminals:
 #             if hasattr(user_data,terminal_column) and getattr(user_data, terminal_column) == 1:
 #                selected_terminals.append(terminal_column)
 #       return selected_terminals

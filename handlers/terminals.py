@@ -9,7 +9,7 @@ from database.engine import engine
 from database.orm_query import save_delta_to_database
 from keyboards.inline import get_callback_btns
 from misc.processing_terminals import (processing_terminals_button,
-                                       terminal_buttons,
+                                       all_terminals,
                                        user_buttons, 
                                        # get_selected_terminals, 
                                        calculate_date_delta,
@@ -18,8 +18,6 @@ from misc.processing_terminals import (processing_terminals_button,
 
 terminal_router = Router()
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
-
-all_terminals = {'Beliy_Rast', 'Elektrougli', 'Vorsino', 'Selyatino', 'Khovrino', 'Ramenskoye', 'Lyubertsy'}
 
 
 class TerminalState(StatesGroup):
@@ -32,7 +30,7 @@ class TerminalState(StatesGroup):
 # выводим пользователю список терминалов
 @terminal_router.message(StateFilter(None), Command('work'))
 async def names_of_terminals(message: types.Message):
-   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns=terminal_buttons)) 
+   await message.answer("Выберите терминал (1 шт.):", reply_markup=await get_callback_btns(btns=all_terminals)) 
 
 
 #отмена действий
